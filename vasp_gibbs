@@ -1,0 +1,79 @@
+#!/usr/bin/env python3
+
+import argparse
+import subprocess
+import re
+
+# Parameters
+factor = 1.3
+
+def read_options():
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-n","--ncores",dest="ncores",type=int, default=1, help="Number of cores for vasp run")
+    parser.add_argument("-c","--mpi-command",dest="command",type=str, default="srun", help="Mpi execution command e.g. mpirun, mpiexec, srun")
+    parser.add_argument("-v","--vasp",dest="vasp",type=str, default="vasp_std", help="Which vasp executable to run")
+
+    args = parser.parse_args()
+
+    return args
+
+def prepare_incar:
+
+    # Read Vasp input files
+    with open("INCAR", "r") as f:
+        old_incar = f.read()
+
+    with open("POTCAR", "r") as f:
+        potcar = f.read()
+
+    # Set ENCUT
+    enmax =  max([float(a.group(0)) for a in re.finditer("ENMAX\s*=\s*\K[\-0-9\.]+", potcar)])
+
+    old_encut =  re.match("ENCUT\s*=\s*[\-0-9\.]+", potcar)
+
+    if old_encut:
+        if float(old_encut.group(0)) > factor*enmax:
+            new_encut = float(old_encut.group(0))
+        else:
+            new_encut = factor*enmax
+        new_incar =  re.sub("ENCUT\s*=\s*\K[\-0-9\.]+", new_encut, old_incar)
+    else:
+        new_incar = old_incar + "\n\nENCUT = %f\n"%(factor*enmax)
+
+    if re.match("IBRION\s*=\s*[\-0-9]+", new_incar):
+        new_incar =  re.sub("IBRION\s*=\s*\K[\-0-9]+", "5", new_incar)
+    else:
+        new_incar = new_incar + ("\n" if new_incar[-1] != "\n" else "\n") + "IBRION = 5"
+
+    new_incar =  re.sub("NSW\s*=\s*[\-0-9]+", "", new_incar)
+
+    new_incar =  re.sub("ISTART\s*=\s*[\-0-9]+", "1", new_incar)
+
+    new_incar =  re.sub("ICHARG\s*=\s*[\-0-9]+", "0", new_incar)
+
+    with open("INCAR", "w") as f:
+        f.write(new_incar)
+
+    with open("INCAR.save", "w") as f:
+        f.write(new_incar)
+    
+def prepare_poscar(list):
+    with open("POSCAR", "r") as f:
+        old_poscar = f.readlines()
+
+    if re.match("^(?:[0-9]+\s*)+$", old_poscar[5]):
+        # Use potcar atoms
+        with open("POTCAR", "r") as f:
+            potcar = f.read()
+        elements = re.findall("TITEL\s*=\s*\w+\s*\K\w+", potcar)
+    
+    
+
+def run_vasp(command, ncores, vasp):
+    subprocess.run(command,"-n",ncores,vasp)
+
+def main():
+    
+
+main()
