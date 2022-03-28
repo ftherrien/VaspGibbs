@@ -11,6 +11,8 @@ import numpy.linalg as la
 factor = 1.3
 tol = 1e-6
 
+vgout = None
+
 def read_options():
 
     parser = argparse.ArgumentParser()
@@ -89,7 +91,7 @@ def read_poscar():
         elem = elements[i<=nelem-1][0]
         
         if selective:
-            sel = np.array([float(a) for a in content[3:]])
+            sel = np.array(content[3:])
         else:
             sel = None
             
@@ -124,9 +126,10 @@ def write_poscar(cell,atoms):
     with open("POSCAR", "w") as f:
         f.write(poscar)
 
-def prepare_poscar(list_atoms, top):
+def prepare_poscar(list_atoms, top, save = True):
 
-    shutil.copyfile("POSCAR", "POSCAR.save")
+    if save:
+        shutil.copyfile("POSCAR", "POSCAR.save")
 
     cell, atoms = read_poscar()
 
@@ -155,14 +158,78 @@ def run_vasp(command, ncores, vasp):
     else:
         subprocess.run([command, "-n", str(ncores), vasp])
 
+def read_outcar():
+    try:
+        with open("OUTCAR", "r") as f:
+            outcar = f.read()
+    except FileNotFoundError:
+        return False, None, None
+
+    success = re.search("General timing and accounting informations for this job", outcar) is not None
+
+    ibrion =  int(re.findall("IBRION\s*=\s*([\-0-9]+)", outcar)[-1])
+
+    freq = []
+    if re.search("Eigenvectors and eigenvalues of the dynamical matrix", outcar):
+        for i, match in enumerate(re.finditer("[0-9]+\sf(\/i)*\s*=\s*([0-9.]+)", outcar)):
+            if match.group(1) is None:
+                freq.append(float(match.group(2)))
+            else:
+                print("Warning frequency %d is imaginary (i*%s). Your structure may not be properly relaxed. Ignoring this frequency."%(i, match.group(2)), file=vgout)
+    else:
+        freq = None
+
+    return success, ibrion, freq
+    
+
 def main():
 
     args = read_options()
+
+    global vgout
+
+    vgout = open("VaspGibbs.out","w")  
+
+    print("VaspGibbs BETA\n", file=vgout)
+    print("Parameters:", file=vgout)
+    for arg in vars(args):
+        print(arg, ":", vars(args)[arg], file=vgout)
+    print(file=vgout)
+
+    shutil.copyfile("POSCAR", "POSCAR.save")
+
+    # Read the old outcar
+    success, ibrion, freq = read_outcar()
+
+    if ibrion in [4,5,6,7]:
+        print("Vibration frequencies have been calculated, using existing files.", file=vgout)
     
-    prepare_incar(args.ibrion)
+    else:
+        if not success:
+            print("Warning: VaspGibbs must start from a completed calculation. From your OUTCAR, it seems like the calculation did not properly finish.", file=vgout)
     
-    prepare_poscar(args.list_atoms, args.top)
+        if ibrion != "-1":
+            print("Warning: starting from non-static run (IBRION = %2d)", file=vgout)
+            print("VaspGibbs will copy the CONTCAR to POSCAR", file=vgout)
+            shutil.copyfile("POSCAR", "POSCAR.save")
+            shutil.copyfile("CONTCAR", "CONTCAR.save")
+            shutil.copyfile("CONTCAR", "POSCAR")
     
-    run_vasp(args.command, args.ncores, args.vasp)
+        prepare_incar(args.ibrion)
+    
+        prepare_poscar(args.list_atoms, args.top, ibrion == "-1")
+    
+        run_vasp(args.command, args.ncores, args.vasp)
+
+        # Reading the new outcar
+        success, ibrion, freq = read_outcar()
+
+    h = 0.4135667696923859 # eV/THz
+
+    E_zpe = 1 / 2 * h * np.sum(freq)
+
+    print("Gibbs corrections:", file=vgout)
+    print("E_zpe : %f"%(E_zpe), file=vgout)
+
 
 main()

@@ -33,9 +33,11 @@ To run vasp in parallel call:
 vasp_gibbs -n [number of proc] -m [mpi executable] -v [vasp executable]
 ```
 
-By default `srun` and `vasp_std are used.
+By default `srun` and `vasp_std` are used.
+
+The thermodynamic quantities can ve found in the `VaspGibbs.out` file.
 
 **Under development**
 
-Currently working on reading the OUTCAR and computing gibbs free energy corrections. The features stated above should already work.
+The features stated above should already work. ZPE is calculated. Currently working on heat capacity and entropy contributions from vibrations, rotations and translations. 
 
