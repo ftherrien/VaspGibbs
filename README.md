@@ -37,6 +37,14 @@ By default `srun` and `vasp_std` are used.
 
 The thermodynamic quantities can ve found in the `VaspGibbs.out` file.
 
+## Online Ressources
+
+* https://pubs.acs.org/doi/abs/10.1021/jp407468t (Supporting Information)
+* https://gaussian.com/thermo/
+* https://wiki.fysik.dtu.dk/ase/ase/thermochemistry/thermochemistry.html
+* https://chem.libretexts.org/Bookshelves/Physical_and_Theoretical_Chemistry_Textbook_Maps/Statistical_Thermodynamics_(Jeschke)/06%3A_Partition_Functions_of_Gases/6.04%3A_Rotational_Partition_Function
+
+
 **Under development**
 
 The features stated above should already work. ZPE is calculated. Currently working on heat capacity and entropy contributions from vibrations, rotations and translations. 

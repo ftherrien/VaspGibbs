@@ -6,6 +6,7 @@ import re
 import shutil
 import numpy as np
 import numpy.linalg as la
+from thermo import compute_thermo
 
 # Parameters
 factor = 1.3
@@ -152,6 +153,8 @@ def prepare_poscar(list_atoms, top, save = True):
     
     write_poscar(cell,atoms)
 
+    return cell,atoms
+
 def run_vasp(command, ncores, vasp):
     if ncores == 1:
         subprocess.run([vasp])
@@ -217,19 +220,13 @@ def main():
     
         prepare_incar(args.ibrion)
     
-        prepare_poscar(args.list_atoms, args.top, ibrion == "-1")
+        cell, atoms = prepare_poscar(args.list_atoms, args.top, ibrion == "-1")
     
         run_vasp(args.command, args.ncores, args.vasp)
 
         # Reading the new outcar
         success, ibrion, freq = read_outcar()
 
-    h = 0.4135667696923859 # eV/THz
-
-    E_zpe = 1 / 2 * h * np.sum(freq)
-
-    print("Gibbs corrections:", file=vgout)
-    print("E_zpe : %f"%(E_zpe), file=vgout)
-
+    compute_thermo(freq, cell, atoms)
 
 main()
