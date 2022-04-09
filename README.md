@@ -35,7 +35,9 @@ vasp_gibbs -n [number of proc] -m [mpi executable] -v [vasp executable]
 
 By default `srun` and `vasp_std` are used.
 
-The thermodynamic quantities can ve found in the `VaspGibbs.out` file.
+VaspGibbs will compute the moment of inertia and symmetry of your molecule and compute rotational and translational contributions if you specify that the system is a molecule with the '-m' flag.
+
+The thermodynamic quantities can ve found in the `VaspGibbs.md` file. Note that the output file is in markdown language!
 
 ## Online Ressources
 
@@ -45,7 +47,9 @@ The thermodynamic quantities can ve found in the `VaspGibbs.out` file.
 * https://chem.libretexts.org/Bookshelves/Physical_and_Theoretical_Chemistry_Textbook_Maps/Statistical_Thermodynamics_(Jeschke)/06%3A_Partition_Functions_of_Gases/6.04%3A_Rotational_Partition_Function
 
 
-**Under development**
+## **Under development**
 
-The features stated above should already work. ZPE is calculated. Currently working on heat capacity and entropy contributions from vibrations, rotations and translations. 
+The features stated above should already work. Currently all quantities are calculated and printed in `VaspGibbs.md` but features are mostly untested: use with care. The `molecule` feature (rotation, translation) is untested.
+
+*Next steps:* more testing, setup.py, pypi  
 

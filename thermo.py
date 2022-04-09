@@ -1,4 +1,5 @@
 import numpy as np
+import re
 
 tol = 1e-5
 
@@ -8,6 +9,10 @@ kb = 8.6173332621452e-5 # eV/K
 
 conv_I = 1.03642697e-4 #from A*(Da)**2 to eV/THz**2
 
+conv_P = 6.242e-9 #from kPa to eV/A**3
+
+conv_m = 0.103642696e-3 #from Da to eV/(A**2*THz**2) 
+
 # Electronic contributions
 class Elec:
     def __init__(self):
@@ -15,22 +20,22 @@ class Elec:
         with open("OUTCAR", "r") as f:
             outcar = f.read()
     
-        nelect = int(re.findall("NELECT\s*=\s*([\0-9]+)", outcar)[-1])
+        nelect = int(re.findall("NELECT\s*=\s*([0-9]+)", outcar)[-1])
     
-        nup = int(re.findall("NUPDOWN\s*=\s*([\0-9]+)", outcar)[-1])
+        nup = int(re.findall("NUPDOWN\s*=\s*([\-0-9]+)", outcar)[-1])
     
         if nup != -1:
             self.Z = nup + 1
         else:
             self.Z = nelect%2 + 1
     
-    self.S =  kb * np.log(self.Z)
+        self.S =  kb * np.log(self.Z)
     
-    self.E = 0
+        self.E = 0
 
 # Vibratonal contributions
 class Vib:
-    def __inti__(self, T, freq):
+    def __init__(self, T, freq):
         # Harmonic oscillator approximation, breaks down at high temperatures
         self.Z =  np.prod(1 / (1 - np.exp( - h * freq / (kb * T))))
     
@@ -71,9 +76,9 @@ class Trans:
     def __init__(T, P, cell, atoms):
         # Ideal gas approximation
 
-        masses = get_masses(atoms)
+        masses = get_masses(atoms)*conv_m
 
-        self.Z = (2*np.pi*np.sum(masses)*kb*T/h^2)**(3/2)*kb*T/P
+        self.Z = (2*np.pi*np.sum(masses)*kb*T/h^2)**(3/2)*kb*T/(P*conv_P)
         self.S = kb * (np.log(self.Z) + 5/2)
         self.E = 3/2*kb*T
 
@@ -81,7 +86,7 @@ def get_masses(atoms):
     with open("POTCAR", "r") as f:
         potcar = f.read()
     elements = np.array(re.findall("TITEL\s*=\s*\w+\s*(\w+)", potcar))
-    mass_elem = np.array([float(a) for a in re.findall("POMASS\s*=\s*([0-9.]+)\s*", potcar)])
+    mass_elem = np.array([float(a) for a in re.findall("POMASS\s*=\s*([0-9\.]+)\s*", potcar)])
     
     masses = np.zeros(len(atoms))
     for i, a in enumerate(atoms):
@@ -158,11 +163,31 @@ def get_symmetry_number(cell, atoms, masses, I_mat):
 
     return sig
 
-def compute_thermo(T, freq, cell, atoms):
-    print("Gibbs corrections:", file=vgout)
+def compute_thermo(T, P, freq, E_dft, cell, atoms, mol):
 
     E_zpe = 1 / 2 * h * np.sum(freq)
 
-    # electronic contribution
+    elec = Elec()
+    vib = Vib(T, freq)
 
-    print("E_zpe : %f"%(E_zpe), file=vgout)
+    if mol:
+        rot = Rot(T, cell, atoms)
+        trans = Trans(T, P, cell, atoms)
+
+        H = E_dft + E_zpe + elec.E + vib.E + rot.E + trans.E + kb*T
+        S = elec.S + vib.S + rot.S + trans.S + kb
+
+        G = H - T*S
+
+        return G, H, S, E_zpe, elec, vib, rot, trans
+        
+    else:
+        # Assuming incompressible solid
+        H = E_dft + E_zpe + elec.E + vib.E
+        S = elec.S + vib.S + kb
+
+        G = H - T*S
+        
+        return G, H, S, E_zpe, elec, vib
+
+
