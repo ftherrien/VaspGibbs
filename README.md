@@ -4,12 +4,11 @@ A simple way to get Gibbs free energy from Vasp calculations
 
 ## Installation
 
-`pip install` coming soon. For now copy `vasp_gibbs` to you working directory or add this folder to your `PATH`:
 ```
-git clone https://github.com/ftherrien/VaspGibbs.git
-echo "export PATH=$PATH:$PWD/VaspGibbs" >> $HOME/.bashrc
-source $HOME/.bashrc
+pip install git+https://github.com/ftherrien/VaspGibbs
 ```
+
+*Latest version:* 0.0.1 (beta)
 
 ## Usage
 
@@ -18,7 +17,7 @@ In a folder with a finished vasp calculation, run
 vasp_gibbs
 ```
 
-`vasp_gibbs` will rerun vasp to get vibration modes and output the gibbs free energy of your system.
+`vasp_gibbs` will rerun Vasp to obtain vibration modes and output the gibbs free energy of your system.
 
 Use `-o` (only) or `-t`(top) to specify a set of atoms for which to calculate vibration modes. Examples:
 
@@ -35,9 +34,31 @@ vasp_gibbs -n [number of proc] -m [mpi executable] -v [vasp executable]
 
 By default `srun` and `vasp_std` are used.
 
-VaspGibbs will compute the moment of inertia and symmetry of your molecule and compute rotational and translational contributions if you specify that the system is a molecule with the '-m' flag.
+VaspGibbs will automatically compute the moment of inertia and symmetry of your molecule and compute rotational and translational contributions if you specify that the system is a molecule with the `-m` flag.
 
-The thermodynamic quantities can ve found in the `VaspGibbs.md` file. Note that the output file is in markdown language!
+The temperature and pressure can be set using the `-T` and `-P` flags.
+
+### Output
+
+All outputs can be found in the VaspGibbs.md file. It contains the following information:
+
+#### Energy corrections
+|      Type      |       Z        |     E (eV)     |    S (eV/K)    |     F (eV)     |
+| :------------: | :------------: | :------------: | :------------: | :------------: |
+|      ZPE       |      N/A       |        x       |      N/A       |      N/A       |
+|   Electronic   |        x       |        x       |        x       |        x       |
+|  Vibrational   |        x       |        x       |        x       |        x       |
+|   Rotational   |        x       |        x       |        x       |        x       |
+| Translational  |        x       |        x       |        x       |        x       |
+
+#### Thermodynamic Quantities
+|     Quantity      |        Value        |
+| :---------------: | :-----------------: |
+|     Enthalpy      |          x      eV  |
+|      Entropy      |          x     eV/K |
+| Gibbs Free Energy |          x      eV  |
+|     G - E_dft     |          x      eV  |
+|        TS         |          x      eV  |
 
 ## Online Ressources
 
@@ -47,9 +68,11 @@ The thermodynamic quantities can ve found in the `VaspGibbs.md` file. Note that 
 * https://chem.libretexts.org/Bookshelves/Physical_and_Theoretical_Chemistry_Textbook_Maps/Statistical_Thermodynamics_(Jeschke)/06%3A_Partition_Functions_of_Gases/6.04%3A_Rotational_Partition_Function
 
 
-## **Under development**
+## Under development
 
-The features stated above should already work. Currently all quantities are calculated and printed in `VaspGibbs.md` but features are mostly untested: use with care. The `molecule` feature (rotation, translation) is untested.
+The features stated above should already work. Currently all quantities are calculated and printed in `VaspGibbs.md` but more validation needs to be done.
 
-*Next steps:* more testing, setup.py, pypi  
+*Next steps:* more testing, add to pypi
+
+Let me know if you would like new features to be added!  
 

@@ -1,17 +1,20 @@
 import numpy as np
+import numpy.linalg as la
 import re
+from copy import deepcopy
 
-tol = 1e-5
+# Parameters
+symtol = 1e-5 # Tolerance for symmetry relative to cell vectors
+Itol = 1e-5 # Tolerance for moment of inertia relative to max
 
+# Constants =========================================
 h = 0.004135667696923859 # eV/THz
-
 kb = 8.6173332621452e-5 # eV/K
-
 conv_I = 1.03642697e-4 #from A*(Da)**2 to eV/THz**2
-
 conv_P = 6.242e-9 #from kPa to eV/A**3
-
 conv_m = 0.103642696e-3 #from Da to eV/(A**2*THz**2) 
+# ===================================================
+
 
 # Electronic contributions
 class Elec:
@@ -37,6 +40,9 @@ class Elec:
 class Vib:
     def __init__(self, T, freq):
         # Harmonic oscillator approximation, breaks down at high temperatures
+
+        freq = np.real(freq[np.isreal(freq)])
+
         self.Z =  np.prod(1 / (1 - np.exp( - h * freq / (kb * T))))
     
         self.S =  kb * (np.sum( h * freq / (kb * T) / (np.exp( h * freq / (kb * T)) - 1)) + np.log(self.Z))
@@ -45,7 +51,7 @@ class Vib:
 
 # Rotational contributions
 class Rot:
-    def __init__(T, cell, atoms):
+    def __init__(self, T, cell, atoms, tol=Itol):
         # Rigid rotor approximation, only applies to smaller molecules
     
         if len(atoms) == 1:
@@ -57,10 +63,11 @@ class Rot:
         masses = get_masses(atoms)
     
         I_mat = get_inertia(cell, atoms, masses)
-    
-        sigma = get_symmetry_number(cell, atoms, masses, I)
-    
-        if la.det(I_mat) < tol:
+
+        sigma = get_symmetry_number(cell, atoms, masses, I_mat)
+
+
+        if la.det(I_mat) < tol*np.max(I_mat):
             self.Z = 1 / sigma * (8 * np.pi**2 * kb * T / h**2)**(3/2) * np.sqrt(np.pi * la.det(I_mat))
             self.E = 3/2*kb*T
         else:
@@ -73,24 +80,24 @@ class Rot:
 
 # Translational contributions
 class Trans:
-    def __init__(T, P, cell, atoms):
+    def __init__(self, T, P, cell, atoms):
         # Ideal gas approximation
 
         masses = get_masses(atoms)*conv_m
 
-        self.Z = (2*np.pi*np.sum(masses)*kb*T/h^2)**(3/2)*kb*T/(P*conv_P)
+        self.Z = (2*np.pi*np.sum(masses)*kb*T/h**2)**(3/2)*kb*T/(P*conv_P)
         self.S = kb * (np.log(self.Z) + 5/2)
         self.E = 3/2*kb*T
 
 def get_masses(atoms):
     with open("POTCAR", "r") as f:
         potcar = f.read()
-    elements = np.array(re.findall("TITEL\s*=\s*\w+\s*(\w+)", potcar))
+    elements = np.array(re.findall("VRHFIN\s*=\s*(\w+):", potcar))
     mass_elem = np.array([float(a) for a in re.findall("POMASS\s*=\s*([0-9\.]+)\s*", potcar)])
     
     masses = np.zeros(len(atoms))
     for i, a in enumerate(atoms):
-        masses[i] = mass_elem(elements==a[0])[0]
+        masses[i] = mass_elem[elements==a[0]][0]
 
     return masses
 
@@ -121,7 +128,10 @@ def rot_mat(u, theta):
 
 def rotate_mol(cell, atoms, cm, u, theta):
 
+    atoms = deepcopy(atoms)
+
     R = rot_mat(u, theta)
+
     icell = la.inv(cell)
 
     for k,e in enumerate(atoms):
@@ -131,7 +141,7 @@ def rotate_mol(cell, atoms, cm, u, theta):
 
     return atoms
 
-def is_same(cell, atoms1, atoms2):
+def is_same(cell, atoms1, atoms2, tol=symtol):
     for elem1, pos1, _ in atoms1:
         for elem2, pos2, _ in atoms2:
             if elem1 == elem2 and la.norm(cell.dot(pos1 - pos2)) < tol:
@@ -151,8 +161,9 @@ def get_symmetry_number(cell, atoms, masses, I_mat):
 
     I, R = la.eigh(I_mat)
 
-    _,reps = np.unique([e for e,_,_ in atoms], return_counts=True)
+    unique,reps = np.unique([e for e,_,_ in atoms], return_counts=True)
 
+    sig = 1
     for i in range(3):
         sig_axis = 1
         for j in range(1, max(reps)):
@@ -165,12 +176,15 @@ def get_symmetry_number(cell, atoms, masses, I_mat):
 
 def compute_thermo(T, P, freq, E_dft, cell, atoms, mol):
 
+    freq = np.real(freq[np.isreal(freq)])
+
     E_zpe = 1 / 2 * h * np.sum(freq)
 
     elec = Elec()
     vib = Vib(T, freq)
 
     if mol:
+
         rot = Rot(T, cell, atoms)
         trans = Trans(T, P, cell, atoms)
 
