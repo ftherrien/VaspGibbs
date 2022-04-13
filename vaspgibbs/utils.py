@@ -29,8 +29,8 @@ def prepare_incar(ibrion):
     with open("INCAR", "w") as f:
         f.write(new_incar)
     
-def read_poscar():
-    with open("POSCAR", "r") as f:
+def read_poscar(file="POSCAR"):
+    with open(file, "r") as f:
         old_poscar = f.readlines()
 
     scale = float(old_poscar[1].strip())
@@ -151,6 +151,9 @@ def read_outcar():
 
     success = re.search("General timing and accounting informations for this job", outcar) is not None
 
+    if not success:
+        return False, None, None, None
+
     ibrion =  int(re.findall("IBRION\s*=\s*([\-0-9]+)", outcar)[-1])
 
     freq = []
@@ -166,3 +169,24 @@ def read_outcar():
     E_dft = float(re.findall("energy  without.*sigma\->0\)\s*=\s*([0-9\-\.]+)\s*", outcar)[0])
 
     return success, ibrion, np.array(freq), E_dft
+
+def reposition():
+    cell_old, atoms_old = read_poscar("POSCAR.save")
+    cell, atoms = read_poscar()
+
+    for i, a in enumerate(atoms):
+
+        distmin = None
+        for j in [0,-1]:
+            for k in [0,-1]:
+                for l in [0,-1]:
+                    dist = la.norm(cell.dot(a[1] + [j,k,l]) - cell_old.dot(atoms_old[i][1]))
+                    if distmin is None or dist < distmin:
+                        distmin = dist
+                        shift = [j,k,l]
+        if a[2] is None:
+            atoms[i] = (a[0], a[1] + shift, ["T","T","T"])
+        else:
+            atoms[i] = (a[0], a[1] + shift, a[2])
+
+    write_poscar(cell, atoms)

@@ -8,7 +8,7 @@ A simple way to get Gibbs free energy from Vasp calculations
 pip install git+https://github.com/ftherrien/VaspGibbs
 ```
 
-*Latest version:* 0.0.1 (beta)
+*Latest version:* 0.0.2 (beta)
 
 ## Usage
 
@@ -60,19 +60,19 @@ All outputs can be found in the VaspGibbs.md file. It contains the following inf
 |     G - E_dft     |          x      eV  |
 |        TS         |          x      eV  |
 
-## Online Ressources
+## Oline Ressources
 
 * https://pubs.acs.org/doi/abs/10.1021/jp407468t (Supporting Information)
 * https://gaussian.com/thermo/
 * https://wiki.fysik.dtu.dk/ase/ase/thermochemistry/thermochemistry.html
 * https://chem.libretexts.org/Bookshelves/Physical_and_Theoretical_Chemistry_Textbook_Maps/Statistical_Thermodynamics_(Jeschke)/06%3A_Partition_Functions_of_Gases/6.04%3A_Rotational_Partition_Function
-
+* https://vaspkit.com/tutorials.html#thermo-energy-correction 
 
 ## Under development
 
 The features stated above should already work. Currently all quantities are calculated and printed in `VaspGibbs.md` but more validation needs to be done.
 
-*Next steps:* more testing, add to pypi
+*Next steps:* more testing, add to pypi, PV term for solids with Murnaghan equation
 
 Let me know if you would like new features to be added!  
 

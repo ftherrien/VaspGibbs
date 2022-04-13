@@ -4,7 +4,7 @@ import re
 from copy import deepcopy
 
 # Parameters
-symtol = 1e-5 # Tolerance for symmetry relative to cell vectors
+symtol = 1e-3 # Tolerance for symmetry relative to cell vectors
 Itol = 1e-5 # Tolerance for moment of inertia relative to max
 
 # Constants =========================================
@@ -66,7 +66,6 @@ class Rot:
 
         sigma = get_symmetry_number(cell, atoms, masses, I_mat)
 
-
         if la.det(I_mat) < tol*np.max(I_mat):
             self.Z = 1 / sigma * (8 * np.pi**2 * kb * T / h**2)**(3/2) * np.sqrt(np.pi * la.det(I_mat))
             self.E = 3/2*kb*T
@@ -114,8 +113,9 @@ def get_inertia(cell, atoms, masses):
     I = np.zeros((3,3))
     for i in range(3):
         for j in range(3):
-            for k,e in enumerate(atoms): 
-                I[i,j] += masses[k]*((la.norm((cell.dot(e[1])-cm)) if i==j else 0) - (cell[i,:].dot(e[1])-cm[i])*(cell[j,:].dot(e[1])-cm[j]))
+            for k,e in enumerate(atoms):
+                I[i,j] += masses[k]*((la.norm((cell.dot(e[1])-cm))**2 if i==j else 0) - (cell[i,:].dot(e[1])-cm[i])*(cell[j,:].dot(e[1])-cm[j]))
+
     return I * conv_I
 
 def rot_mat(u, theta):

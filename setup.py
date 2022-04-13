@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='VaspGibbs',
-      version='0.0.1',
+      version='0.0.2',
       description='A simplified way to get Gibbs free energy from Vasp calculations',
       url='https://github.com/ftherrien/VaspGibbs',
       author='Felix Therrien',

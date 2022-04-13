@@ -3,7 +3,7 @@
 import argparse
 import numpy as np
 import shutil
-from vaspgibbs import __version__, read_outcar, read_poscar, prepare_incar, prepare_poscar, compute_thermo
+from vaspgibbs import __version__, read_outcar, read_poscar, prepare_incar, prepare_poscar, run_vasp, compute_thermo, reposition
 
 def read_options():
 
@@ -63,7 +63,6 @@ def print_results(vgout, T, P, E_dft, G, H, S, E_zpe, elec, vib, rot=None, trans
     print(f_char.format("G - E_dft", G - E_dft, "eV"), file=vgout)
     print(f_char.format("TS", T*S, "eV"), file=vgout)
 
-
 def main():
 
     args = read_options()
@@ -98,8 +97,8 @@ def main():
         if ibrion != "-1":
             print("> **Warning**: starting from non-static run (IBRION = %2d)", file=vgout)
             print("> VaspGibbs will copy the CONTCAR to POSCAR", file=vgout)
-            shutil.copyfile("CONTCAR", "CONTCAR.save")
             shutil.copyfile("CONTCAR", "POSCAR")
+            reposition()
     
         cell, atoms = prepare_poscar(args.list_atoms, args.top, ibrion == "-1")
 
