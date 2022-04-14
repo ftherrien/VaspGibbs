@@ -60,7 +60,7 @@ All outputs can be found in the VaspGibbs.md file. It contains the following inf
 |     G - E_dft     |          x      eV  |
 |        TS         |          x      eV  |
 
-## Oline Ressources
+## Online Ressources
 
 * https://pubs.acs.org/doi/abs/10.1021/jp407468t (Supporting Information)
 * https://gaussian.com/thermo/
