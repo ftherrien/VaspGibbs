@@ -4,6 +4,7 @@ import argparse
 import numpy as np
 import shutil
 from vaspgibbs import __version__, read_outcar, read_poscar, prepare_incar, prepare_poscar, run_vasp, compute_thermo, reposition
+from vaspgibbs.thermo import get_inertia, Itol, get_masses
 
 def read_options():
 
@@ -109,9 +110,20 @@ def main():
         # Reading the new outcar
         success, ibrion, freq, E_dft = read_outcar()
 
+    I_mat = get_inertia(cell, atoms, get_masses(atoms))
+
+    if args.mol:
+        if len(atoms) == 1:
+            freq = []
+        if np.linalg.det(I_mat) < Itol*np.max(I_mat):
+            freq = freq[:3*len(atoms)-5]
+        else:
+            freq = freq[:3*len(atoms)-6]
+
     for i,f in enumerate(freq):
         if not np.isreal(f):
             print("> **Warning**: frequency %d is imaginary (i*%s). Your structure may not be properly relaxed. Ignoring this frequency."%(i, np.imag(f)), file=vgout)
+            
 
     results = compute_thermo(args.T, args.P, freq, E_dft, cell, atoms, args.mol)
 

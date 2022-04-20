@@ -43,11 +43,20 @@ class Vib:
 
         freq = np.real(freq[np.isreal(freq)])
 
-        self.Z =  np.prod(1 / (1 - np.exp( - h * freq / (kb * T))))
+        if len(freq) > 0:
+
+            self.Z =  np.prod(1 / (1 - np.exp( - h * freq / (kb * T))))
     
-        self.S =  kb * (np.sum( h * freq / (kb * T) / (np.exp( h * freq / (kb * T)) - 1)) + np.log(self.Z))
+            self.S =  kb * (np.sum( h * freq / (kb * T) / (np.exp( h * freq / (kb * T)) - 1)) + np.log(self.Z))
     
-        self.E = np.sum( h * freq / (np.exp( h * freq / (kb * T)) - 1))
+            self.E = np.sum( h * freq / (np.exp( h * freq / (kb * T)) - 1))
+            
+        else:
+            
+            self.Z =  1
+            self.S =  0
+            self.E =  0
+            
 
 # Rotational contributions
 class Rot:
@@ -66,7 +75,7 @@ class Rot:
 
         sigma = get_symmetry_number(cell, atoms, masses, I_mat)
 
-        if la.det(I_mat) < tol*np.max(I_mat):
+        if la.det(I_mat) > tol*np.max(I_mat):
             self.Z = 1 / sigma * (8 * np.pi**2 * kb * T / h**2)**(3/2) * np.sqrt(np.pi * la.det(I_mat))
             self.E = 3/2*kb*T
         else:
@@ -74,7 +83,9 @@ class Rot:
             I = np.sort(I)
             self.Z = 1 / sigma * 8 * np.pi**2 * kb * T * I[2] / h**2
             self.E = kb*T
-            
+
+        print("SIGMA", sigma)
+
         self.S =  kb * np.log(self.Z) + self.E/T
 
 # Translational contributions
@@ -154,7 +165,7 @@ def is_same(cell, atoms1, atoms2, tol=symtol):
     return False
 
 
-def get_symmetry_number(cell, atoms, masses, I_mat):
+def get_symmetry_number(cell, atoms, masses, I_mat, tol=Itol):
     # Assuming rotational symmetry axis are always principal axes 
     
     cm = get_center_of_mass(cell, atoms, masses)
@@ -165,6 +176,8 @@ def get_symmetry_number(cell, atoms, masses, I_mat):
 
     sig = 1
     for i in range(3):
+        if I[i] < tol*np.max(I) or (i>0 and (I[i] - I[i-1])/I[i] < tol):
+            continue
         sig_axis = 1
         for j in range(1, max(reps)):
             rotated_atoms = rotate_mol(cell, atoms, cm, R[:,i], 2*np.pi/(j+1))

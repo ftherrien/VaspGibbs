@@ -61,7 +61,7 @@ def read_poscar(file="POSCAR"):
 
     atoms = []
     for i, line in enumerate(old_poscar[last+2:]):
-        if re.search("^\s*(?:[\-0-9\.]+(?:e[\-\+]?[0-9]{1,3})?\s+){3}", line):
+        if re.search("^\s*(?:[\-0-9\.]+(?:e[\-\+]?[0-9]{1,3})?\s*){3}", line):
             content = line.split()
         else:
             break
