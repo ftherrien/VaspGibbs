@@ -8,7 +8,7 @@ A simple way to get Gibbs free energy from Vasp calculations
 pip install git+https://github.com/ftherrien/VaspGibbs
 ```
 
-*Latest version:* 0.0.3 (beta)
+*Latest version:* 0.0.4 (beta)
 
 ## Usage
 
@@ -70,9 +70,9 @@ All outputs can be found in the VaspGibbs.md file. It contains the following inf
 
 ## Under development
 
-The features stated above should already work. Currently all quantities are calculated and printed in `VaspGibbs.md` but more validation needs to be done.
+Results are consitent with [J. Phys. Chem. C 2013, 117, 49](https://pubs.acs.org/doi/abs/10.1021/jp407468t). More validation needs to be done; use with care.
 
-*Next steps:* more testing, add to pypi, PV term for solids with Murnaghan equation
+*Next steps:* more testing, add to pypi, PV term for solids with Murnaghan equation, hindered translator and rotor?
 
-Let me know if you would like new features to be added!  
+Let me know if you would like new features to be added!
 

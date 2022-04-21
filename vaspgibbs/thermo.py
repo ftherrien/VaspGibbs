@@ -84,8 +84,6 @@ class Rot:
             self.Z = 1 / sigma * 8 * np.pi**2 * kb * T * I[2] / h**2
             self.E = kb*T
 
-        print("SIGMA", sigma)
-
         self.S =  kb * np.log(self.Z) + self.E/T
 
 # Translational contributions
@@ -96,7 +94,7 @@ class Trans:
         masses = get_masses(atoms)*conv_m
 
         self.Z = (2*np.pi*np.sum(masses)*kb*T/h**2)**(3/2)*kb*T/(P*conv_P)
-        self.S = kb * (np.log(self.Z) + 5/2)
+        self.S = kb * (np.log(self.Z) + 3/2)
         self.E = 3/2*kb*T
 
 def get_masses(atoms):
