@@ -8,7 +8,7 @@ A simple way to get Gibbs free energy from Vasp calculations
 pip install git+https://github.com/ftherrien/VaspGibbs
 ```
 
-*Latest version:* 0.0.4 (beta)
+*Latest version:* 0.1.0 (beta)
 
 ## Usage
 
@@ -42,6 +42,16 @@ The temperature and pressure can be set using the `-T` and `-P` flags.
 
 All outputs can be found in the VaspGibbs.md file. It contains the following information:
 
+#### Rotational properties
+|     Property     |          Value          |
+| :--------------: | :---------------------: |
+|      Sigma       |            x            |
+|   **P. axes**    |                         |
+|       I~1        |       x        eV/THz^2 |
+|       I~2        |       x        eV/THz^2 |
+|       I~3        |       x        eV/THz^2 |
+
+
 #### Energy corrections
 |      Type      |       Z        |     E (eV)     |    S (eV/K)    |     F (eV)     |
 | :------------: | :------------: | :------------: | :------------: | :------------: |
@@ -50,6 +60,7 @@ All outputs can be found in the VaspGibbs.md file. It contains the following inf
 |  Vibrational   |        x       |        x       |        x       |        x       |
 |   Rotational   |        x       |        x       |        x       |        x       |
 | Translational  |        x       |        x       |        x       |        x       |
+
 
 #### Thermodynamic Quantities
 |     Quantity      |        Value        |
@@ -70,7 +81,7 @@ All outputs can be found in the VaspGibbs.md file. It contains the following inf
 
 ## Under development
 
-Results are consitent with [J. Phys. Chem. C 2013, 117, 49](https://pubs.acs.org/doi/abs/10.1021/jp407468t). More validation needs to be done; use with care.
+Results have been checked with [J. Phys. Chem. C 2013, 117, 49](https://pubs.acs.org/doi/abs/10.1021/jp407468t). More validation needs to be done; use with care.
 
 *Next steps:* more testing, add to pypi, PV term for solids with Murnaghan equation, hindered translator and rotor?
 

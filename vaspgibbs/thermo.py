@@ -10,7 +10,7 @@ Itol = 1e-5 # Tolerance for moment of inertia relative to max
 # Constants =========================================
 h = 0.004135667696923859 # eV/THz
 kb = 8.6173332621452e-5 # eV/K
-conv_I = 1.03642697e-4 #from A*(Da)**2 to eV/THz**2
+conv_I = 1.03642697e-4 #from A**2*(Da) to eV/THz**2
 conv_P = 6.242e-9 #from kPa to eV/A**3
 conv_m = 0.103642696e-3 #from Da to eV/(A**2*THz**2) 
 # ===================================================
@@ -73,15 +73,16 @@ class Rot:
     
         I_mat = get_inertia(cell, atoms, masses)
 
-        sigma = get_symmetry_number(cell, atoms, masses, I_mat)
+        self.I,_ = la.eigh(I_mat)
+        self.I = np.sort(self.I)
+
+        self.sigma = get_symmetry_number(cell, atoms, masses, I_mat)
 
         if la.det(I_mat) > tol*np.max(I_mat):
-            self.Z = 1 / sigma * (8 * np.pi**2 * kb * T / h**2)**(3/2) * np.sqrt(np.pi * la.det(I_mat))
+            self.Z = 1 / self.sigma * (8 * np.pi**2 * kb * T / h**2)**(3/2) * np.sqrt(np.pi * la.det(I_mat))
             self.E = 3/2*kb*T
         else:
-            I,_ = la.eigh(I_mat)
-            I = np.sort(I)
-            self.Z = 1 / sigma * 8 * np.pi**2 * kb * T * I[2] / h**2
+            self.Z = 1 / self.sigma * 8 * np.pi**2 * kb * T * self.I[2] / h**2
             self.E = kb*T
 
         self.S =  kb * np.log(self.Z) + self.E/T

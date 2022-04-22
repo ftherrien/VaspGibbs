@@ -24,19 +24,24 @@ def read_options():
 
     return args
 
-def print_results(vgout, T, P, E_dft, G, H, S, E_zpe, elec, vib, rot=None, trans=None):
-    print("\n# Output", file=vgout)
+def print_results(vgout, linear, T, P, E_dft, G, H, S, E_zpe, elec, vib, rot=None, trans=None):
+    print("\n# Output\n", file=vgout)
 
     print("## System properties", file=vgout)
     if rot is not None and trans is not None:
-        print("*This system is a molecule*", file=vgout)
-    s_char="| {:^16} | {:^18} |"
-    f_char="| {:^16} | {:^ 14.7g} {:^3} |"
+        print("*This system is a {:}molecule*".format("linear " if linear else ""), file=vgout)
+    s_char="| {:^16} | {:^23} |"
+    f_char="| {:^16} | {:^ 14.7g} {:^8} |"
     print(s_char.format("Property", "Value"), file=vgout)
-    print(s_char.format(":--------------:", ":----------------:"), file=vgout)
+    print(s_char.format(":--------------:", ":---------------------:"), file=vgout)
     print(f_char.format("DFT Total Energy", E_dft, "eV"), file=vgout)
     print(f_char.format("Temperature", T, "K"), file=vgout)
     print(f_char.format("Pressure", P, "KPa"), file=vgout)
+    print(f_char.format("Sigma", rot.sigma, ""), file=vgout)
+    print(s_char.format("**P. axes**", ""), file=vgout)
+    print(f_char.format("I~1", rot.I[0], "eV/THz^2"), file=vgout)
+    print(f_char.format("I~2", rot.I[1], "eV/THz^2"), file=vgout)
+    print(f_char.format("I~3", rot.I[2], "eV/THz^2"), file=vgout)
     print(file=vgout)
     
     print("## Energy corrections", file=vgout)
@@ -85,7 +90,7 @@ def main():
 
     # If frequencies have been calculated, use them
     if ibrion in [4,5,6,7]:
-        print("*Vibrational frequencies have been calculated, using existing files.*\n", file=vgout)
+        print("*Vibrational frequencies have been calculated, using existing files.*", file=vgout)
         cell, atoms = read_poscar()
 
     else:
@@ -112,11 +117,13 @@ def main():
 
     I_mat = get_inertia(cell, atoms, get_masses(atoms))
 
+    linear = False
     if args.mol:
         if len(atoms) == 1:
             freq = []
         if np.linalg.det(I_mat) < Itol*np.max(I_mat):
             freq = freq[:3*len(atoms)-5]
+            linear = True
         else:
             freq = freq[:3*len(atoms)-6]
 
@@ -127,6 +134,6 @@ def main():
 
     results = compute_thermo(args.T, args.P, freq, E_dft, cell, atoms, args.mol)
 
-    print_results(vgout, args.T, args.P, E_dft, *results)
+    print_results(vgout, linear, args.T, args.P, E_dft, *results)
 
 main()
