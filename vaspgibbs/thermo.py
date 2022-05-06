@@ -101,7 +101,7 @@ class Trans:
 def get_masses(atoms):
     with open("POTCAR", "r") as f:
         potcar = f.read()
-    elements = np.array(re.findall("VRHFIN\s*=\s*(\w+):", potcar))
+    elements = np.array(re.findall("VRHFIN\s*=\s*(\w+)\s*:", potcar))
     mass_elem = np.array([float(a) for a in re.findall("POMASS\s*=\s*([0-9\.]+)\s*", potcar)])
     
     masses = np.zeros(len(atoms))
