@@ -37,11 +37,12 @@ def print_results(vgout, linear, T, P, E_dft, G, H, S, E_zpe, elec, vib, rot=Non
     print(f_char.format("DFT Total Energy", E_dft, "eV"), file=vgout)
     print(f_char.format("Temperature", T, "K"), file=vgout)
     print(f_char.format("Pressure", P, "KPa"), file=vgout)
-    print(f_char.format("Sigma", rot.sigma, ""), file=vgout)
-    print(s_char.format("**P. axes**", ""), file=vgout)
-    print(f_char.format("I~1", rot.I[0], "eV/THz^2"), file=vgout)
-    print(f_char.format("I~2", rot.I[1], "eV/THz^2"), file=vgout)
-    print(f_char.format("I~3", rot.I[2], "eV/THz^2"), file=vgout)
+    if rot is not None:
+        print(f_char.format("Sigma", rot.sigma, ""), file=vgout)
+        print(s_char.format("**P. axes**", ""), file=vgout)
+        print(f_char.format("I~1", rot.I[0], "eV/THz^2"), file=vgout)
+        print(f_char.format("I~2", rot.I[1], "eV/THz^2"), file=vgout)
+        print(f_char.format("I~3", rot.I[2], "eV/THz^2"), file=vgout)
     print(file=vgout)
     
     print("## Energy corrections", file=vgout)
@@ -88,10 +89,14 @@ def main():
     # Read the old outcar
     success, ibrion, freq, E_dft = read_outcar()
 
+    cell, atoms = read_poscar()
+
     # If frequencies have been calculated, use them
     if ibrion in [4,5,6,7]:
         print("*Vibrational frequencies have been calculated, using existing files.*", file=vgout)
-        cell, atoms = read_poscar()
+
+    elif args.mol and len(atoms) == 1:
+        freq = np.array([])
 
     else:
         if not success:
@@ -100,13 +105,13 @@ def main():
         prepare_incar(args.ibrion)
 
         shutil.copyfile("POSCAR", "POSCAR.save")
-        if ibrion != "-1":
-            print("> **Warning**: starting from non-static run (IBRION = %2d)", file=vgout)
+        if ibrion != -1:
+            print("> **Warning**: starting from non-static run (IBRION = %2d)"%(ibrion), file=vgout)
             print("> VaspGibbs will copy the CONTCAR to POSCAR", file=vgout)
             shutil.copyfile("CONTCAR", "POSCAR")
             reposition()
     
-        cell, atoms = prepare_poscar(args.list_atoms, args.top, ibrion == "-1")
+        cell, atoms = prepare_poscar(cell, atoms, args.list_atoms, args.top)
 
         shutil.copyfile("OUTCAR", "OUTCAR.save")
 
@@ -126,6 +131,9 @@ def main():
             linear = True
         else:
             freq = freq[:3*len(atoms)-6]
+
+    if freq is None:
+        raise RuntimeError("Could not find frequencies in OUTCAR")
 
     for i,f in enumerate(freq):
         if not np.isreal(f):

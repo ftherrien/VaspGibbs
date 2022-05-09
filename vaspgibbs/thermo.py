@@ -41,13 +41,14 @@ class Vib:
     def __init__(self, T, freq):
         # Harmonic oscillator approximation, breaks down at high temperatures
 
-        freq = np.real(freq[np.isreal(freq)])
+        if len(freq) > 0:
+            freq = np.real(freq[np.isreal(freq)])
 
         if len(freq) > 0:
 
-            self.Z =  np.prod(1 / (1 - np.exp( - h * freq / (kb * T))))
+            self.Z = np.prod(1 / (1 - np.exp( - h * freq / (kb * T))))
     
-            self.S =  kb * (np.sum( h * freq / (kb * T) / (np.exp( h * freq / (kb * T)) - 1)) + np.log(self.Z))
+            self.S = kb * (np.sum( h * freq / (kb * T) / (np.exp( h * freq / (kb * T)) - 1)) + np.log(self.Z))
     
             self.E = np.sum( h * freq / (np.exp( h * freq / (kb * T)) - 1))
             
@@ -67,6 +68,8 @@ class Rot:
             self.Z =  1
             self.S =  0
             self.E =  0
+            self.sigma = 1
+            self.I = [0,0,0]
             return
     
         masses = get_masses(atoms)
@@ -188,7 +191,8 @@ def get_symmetry_number(cell, atoms, masses, I_mat, tol=Itol):
 
 def compute_thermo(T, P, freq, E_dft, cell, atoms, mol):
 
-    freq = np.real(freq[np.isreal(freq)])
+    if len(freq) > 0:
+        freq = np.real(freq[np.isreal(freq)])
 
     E_zpe = 1 / 2 * h * np.sum(freq)
 

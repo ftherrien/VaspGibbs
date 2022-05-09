@@ -108,12 +108,7 @@ def write_poscar(cell,atoms):
     with open("POSCAR", "w") as f:
         f.write(poscar)
 
-def prepare_poscar(list_atoms, top, save = True, tol=postol):
-
-    if save:
-        shutil.copyfile("POSCAR", "POSCAR.save")
-
-    cell, atoms = read_poscar()
+def prepare_poscar(cell, atoms, list_atoms, top, tol=postol):
 
     z = []
     for i,a in enumerate(atoms):
@@ -163,12 +158,13 @@ def read_outcar():
                 freq.append(float(match.group(2)))
             else:
                 freq.append(float(match.group(2))*(0+1j))
+        freq = np.array(freq)
     else:
         freq = None
 
     E_dft = float(re.findall("energy  without.*sigma\->0\)\s*=\s*([0-9\-\.]+)\s*", outcar)[0])
 
-    return success, ibrion, np.array(freq), E_dft
+    return success, ibrion, freq, E_dft
 
 def reposition():
     cell_old, atoms_old = read_poscar("POSCAR.save")
