@@ -9,7 +9,8 @@ postol = 1e-5 # Tolerence for c position in poscar
 
 def prepare_incar(ibrion):
 
-    shutil.copyfile("INCAR", "INCAR.save")
+    if not os.path.is_file("INCAR.save"):
+        shutil.copyfile("INCAR", "INCAR.save")
 
     # Read Vasp input files
     with open("INCAR", "r") as f:
@@ -133,9 +134,9 @@ def prepare_poscar(cell, atoms, list_atoms, top, tol=postol):
 
 def run_vasp(command, ncores, vasp):
     if ncores == 1:
-        subprocess.run([vasp])
+        subprocess.run([vasp], check=True)
     else:
-        subprocess.run([command, "-n", str(ncores), vasp])
+        subprocess.run([command, "-n", str(ncores), vasp], check=True)
 
 def read_outcar():
     try:

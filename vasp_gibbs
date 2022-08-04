@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import os
 import argparse
 import numpy as np
 import shutil
@@ -104,8 +105,9 @@ def main():
     
         prepare_incar(args.ibrion)
 
-        shutil.copyfile("POSCAR", "POSCAR.save")
-        if ibrion != -1:
+        if not os.path.is_file("POSCAR.save"):
+            shutil.copyfile("POSCAR", "POSCAR.save")
+        if ibrion != -1 and is not None:
             print("> **Warning**: starting from non-static run (IBRION = %2d)"%(ibrion), file=vgout)
             print("> VaspGibbs will copy the CONTCAR to POSCAR", file=vgout)
             shutil.copyfile("CONTCAR", "POSCAR")
@@ -113,7 +115,8 @@ def main():
     
         cell, atoms = prepare_poscar(cell, atoms, args.list_atoms, args.top)
 
-        shutil.copyfile("OUTCAR", "OUTCAR.save")
+        if not os.path.is_file("OUTCAR.save"):
+            shutil.copyfile("OUTCAR", "OUTCAR.save")
 
         run_vasp(args.command, args.ncores, args.vasp)
 
