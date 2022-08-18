@@ -3,13 +3,14 @@ import numpy.linalg as la
 import re
 import subprocess
 import shutil
+import os
 
 # Parameters
 postol = 1e-5 # Tolerence for c position in poscar
 
 def prepare_incar(ibrion):
 
-    if not os.path.is_file("INCAR.save"):
+    if not os.path.isfile("INCAR.save"):
         shutil.copyfile("INCAR", "INCAR.save")
 
     # Read Vasp input files
