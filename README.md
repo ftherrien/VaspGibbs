@@ -8,7 +8,7 @@ A simple way to get Gibbs free energy from Vasp calculations
 pip install git+https://github.com/ftherrien/VaspGibbs
 ```
 
-*Latest version:* 0.1.2 (beta)
+*Latest version:* 0.2.0 (beta)
 
 ## Usage
 
