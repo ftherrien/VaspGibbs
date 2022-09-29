@@ -81,7 +81,7 @@ class Rot:
 
         self.sigma = get_symmetry_number(cell, atoms, masses, I_mat)
 
-        if la.det(I_mat) > tol*np.max(I_mat):
+        if la.det(I_mat) > tol*np.max(I_mat)**3:
             self.Z = 1 / self.sigma * (8 * np.pi**2 * kb * T / h**2)**(3/2) * np.sqrt(np.pi * la.det(I_mat))
             self.E = 3/2*kb*T
         else:

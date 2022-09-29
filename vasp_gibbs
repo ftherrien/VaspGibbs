@@ -15,7 +15,7 @@ def read_options():
     parser.add_argument("-v","--vasp",dest="vasp",type=str, default="vasp_std", help="Which vasp executable to run")
     parser.add_argument("-t","--top",dest="top",type=int, default=0, help="Number of atoms to be considered from the top of the c axis for vibrationals modes")
     parser.add_argument("-o","--only",dest="list_atoms",type=str, nargs='+', default=[], help="Specific atoms to consider fro vibrational modes")
-    parser.add_argument("-b","--ibrion",dest="ibrion",type=int, default=5, help="IBRION value", choices=[5, 6])
+    parser.add_argument("-b","--ibrion",dest="ibrion",type=int, default=5, help="IBRION value", choices=[5, 6, 7, 8])
     parser.add_argument("-T","--temperature",dest="T",type=float, default=298.15, help="Temperature of the system")
     parser.add_argument("-P","--pressure",dest="P",type=float, default=101.3, help="Pressure of the system")
     parser.add_argument("-m","--molecule",dest="mol",action="store_true", default=False, help="Use this flag if the sytem is a molecule")
@@ -94,7 +94,7 @@ def main():
     cell, atoms = read_poscar()
 
     # If frequencies have been calculated, use them
-    if ibrion in [4,5,6,7]:
+    if ibrion in [5,6,7,8]:
         print("*Vibrational frequencies have been calculated, using existing files.*", file=vgout, flush=True)
 
     elif args.mol and len(atoms) == 1:
@@ -136,7 +136,7 @@ def main():
     if args.mol:
         if len(atoms) == 1:
             freq = []
-        if np.linalg.det(I_mat) < Itol*np.max(I_mat):
+        if np.linalg.det(I_mat) < Itol*np.max(I_mat)**3:
             freq = freq[:3*len(atoms)-5]
             linear = True
         else:
