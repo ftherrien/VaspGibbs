@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="34.858849mm"
+   height="23.383638mm"
+   viewBox="0 0 34.858849 23.383638"
+   version="1.1"
+   id="svg5"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs2">
+    <linearGradient
+       id="linearGradient3350">
+      <stop
+         style="stop-color:#4a4a4a;stop-opacity:1;"
+         offset="0"
+         id="stop3348" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient1859">
+      <stop
+         style="stop-color:#7300c7;stop-opacity:1;"
+         offset="0"
+         id="stop1855" />
+      <stop
+         style="stop-color:#cb0000;stop-opacity:1;"
+         offset="1"
+         id="stop1857" />
+    </linearGradient>
+    <linearGradient
+       xlink:href="#linearGradient1859"
+       id="linearGradient1861"
+       x1="1.9255681"
+       y1="9.1899967"
+       x2="24.142879"
+       y2="21.454426"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="translate(25.651021,51.860599)" />
+    <linearGradient
+       xlink:href="#linearGradient3350"
+       id="linearGradient175"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="translate(40.390986,50.967726)"
+       x1="62.459316"
+       y1="64.546455"
+       x2="76.505493"
+       y2="64.546455" />
+  </defs>
+  <g
+     id="layer1"
+     transform="translate(-25.651021,-51.860599)">
+    <path
+       style="fill:none;stroke:url(#linearGradient1861);stroke-width:3.52;stroke-linecap:round;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1"
+       d="m 27.411021,61.058062 h 2.24359 c 2.436122,0 2.943414,-7.397251 5.187004,-7.437405 2.24359,-0.04015 3.695937,19.888649 7.185725,19.863553 3.48979,-0.02511 7.821375,0 7.821375,0"
+       id="path236" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:21.6095px;line-height:1.25;font-family:Comfortaa;-inkscape-font-specification:'Comfortaa Bold';fill:url(#linearGradient175);fill-opacity:1;stroke:#4a4a4a;stroke-width:1.446;stroke-dasharray:none;stroke-opacity:1"
+       x="61.076309"
+       y="72.984962"
+       id="text496"
+       transform="matrix(0.98278322,0,-0.27555796,1.0175184,0,0)"><tspan
+         id="tspan494"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:Comfortaa;-inkscape-font-specification:'Comfortaa Bold';fill:url(#linearGradient175);fill-opacity:1;stroke:#4a4a4a;stroke-width:1.446;stroke-dasharray:none;stroke-opacity:1"
+         x="61.076309"
+         y="72.984962">G</tspan></text>
+  </g>
+</svg>

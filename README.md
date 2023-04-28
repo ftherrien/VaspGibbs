@@ -1,15 +1,18 @@
-# VaspGibbs
+<h1 align="center">
+<img src="https://github.com/ftherrien/VaspGibbs/blob/master/docs/VGlogo.svg" height="130">
 
-A simple way to get Gibbs free energy from Vasp calculations
+VaspGibbs
+</h1>
+<br>
+
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7874413.svg)](https://doi.org/10.5281/zenodo.7874413)
+[![PyPI](https://img.shields.io/pypi/v/vaspgibbs)](https://pypi.org/project/VaspGibbs/)
 
 ## Installation
 
 ```
-pip install vaspgibbs
+pip install VaspGibbs
 ```
-
-*Latest version:* 0.2.0 (beta)
-
 ## Usage
 
 In a folder with a finished vasp calculation, run
@@ -82,7 +85,19 @@ All outputs can be found in the VaspGibbs.md file. It contains the following inf
 
 ## Citation
 
-Coming Soon!
+```
+@software{therrien2023vaspgibbs,
+  author       = {Félix Therrien},
+  title        = {{VaspGibbs: A simple way to obtain Gibbs free 
+                   energy from Vasp calculations}},
+  month        = apr,
+  year         = 2023,
+  publisher    = {Zenodo},
+  version      = {v0.2.1},
+  doi          = {10.5281/zenodo.7874413},
+  url          = {https://doi.org/10.5281/zenodo.7874413}
+}
+```
 
 ## Under development
 
