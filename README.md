@@ -5,7 +5,7 @@ A simple way to get Gibbs free energy from Vasp calculations
 ## Installation
 
 ```
-pip install git+https://github.com/ftherrien/VaspGibbs
+pip install vaspgibbs
 ```
 
 *Latest version:* 0.2.0 (beta)
@@ -77,7 +77,12 @@ All outputs can be found in the VaspGibbs.md file. It contains the following inf
 * https://gaussian.com/thermo/
 * https://wiki.fysik.dtu.dk/ase/ase/thermochemistry/thermochemistry.html
 * https://chem.libretexts.org/Bookshelves/Physical_and_Theoretical_Chemistry_Textbook_Maps/Statistical_Thermodynamics_(Jeschke)/06%3A_Partition_Functions_of_Gases/6.04%3A_Rotational_Partition_Function
-* https://vaspkit.com/tutorials.html#thermo-energy-correction 
+* https://vaspkit.com/tutorials.html#thermo-energy-correction
+* https://uregina.ca/~eastalla/entropy.pdf (https://doi.org/10.1063/1.473958)
+
+## Citation
+
+Coming Soon!
 
 ## Under development
 
