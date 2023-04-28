@@ -1,5 +1,5 @@
 <h1 align="center">
-<img src="https://github.com/ftherrien/VaspGibbs/blob/master/docs/VGlogo.svg" height="130">
+<img src="https://raw.githubusercontent.com/ftherrien/VaspGibbs/3e20b2fadb4c5cdf328a1a3194374cf6318bf84a/docs/VGlogo.svg" height="130">
 
 VaspGibbs
 </h1>
