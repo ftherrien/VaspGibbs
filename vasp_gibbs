@@ -14,7 +14,7 @@ def read_options():
     parser.add_argument("-c","--mpi-command",dest="command",type=str, default="srun", help="Mpi execution command e.g. mpirun, mpiexec, srun")
     parser.add_argument("-v","--vasp",dest="vasp",type=str, default="vasp_std", help="Which vasp executable to run")
     parser.add_argument("-t","--top",dest="top",type=int, default=0, help="Number of atoms to be considered from the top of the c axis for vibrationals modes")
-    parser.add_argument("-o","--only",dest="list_atoms",type=str, nargs='+', default=[], help="Specific atoms to consider fro vibrational modes")
+    parser.add_argument("-o","--only",dest="list_atoms",type=str, nargs='+', default=[], help="Specific atoms to consider for vibrational modes. Either atomic species or atoms indices counting from 0")
     parser.add_argument("-b","--ibrion",dest="ibrion",type=int, default=5, help="IBRION value", choices=[5, 6, 7, 8])
     parser.add_argument("-T","--temperature",dest="T",type=float, default=298.15, help="Temperature of the system")
     parser.add_argument("-P","--pressure",dest="P",type=float, default=101.3, help="Pressure of the system")

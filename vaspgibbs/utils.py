@@ -17,16 +17,16 @@ def prepare_incar(ibrion):
     with open("INCAR", "r") as f:
         old_incar = f.read()
 
-    if re.search("IBRION\s*=\s*[\-0-9]+", old_incar):
-        new_incar =  re.sub("(IBRION\s*=\s*)[\-0-9]+", "\g<1>%d"%ibrion, old_incar)
+    if re.search(r"IBRION\s*=\s*[\-0-9]+", old_incar):
+        new_incar =  re.sub(r"(IBRION\s*=\s*)[\-0-9]+", r"\g<1>%d"%ibrion, old_incar)
     else:
         new_incar = old_incar + ("\n" if old_incar[-1] != "\n" else "\n") + "IBRION = %d\n"%ibrion
 
-    new_incar =  re.sub("NSW\s*=\s*[\-0-9]+", "", new_incar)
+    new_incar =  re.sub(r"NSW\s*=\s*[\-0-9]+", r"", new_incar)
 
-    new_incar =  re.sub("(ISTART\s*=\s*)[\-0-9]+", "\g<1>1", new_incar)
+    new_incar =  re.sub(r"(ISTART\s*=\s*)[\-0-9]+", r"\g<1>1", new_incar)
 
-    new_incar =  re.sub("(ICHARG\s*=\s*)[\-0-9]+", "\g<1>0", new_incar)
+    new_incar =  re.sub(r"(ICHARG\s*=\s*)[\-0-9]+", r"\g<1>0", new_incar)
 
     with open("INCAR", "w") as f:
         f.write(new_incar)
@@ -43,11 +43,11 @@ def read_poscar(file="POSCAR"):
 
     cell = cell*scale
 
-    if re.search("^\s*(?:[0-9]+\s*)+$", old_poscar[5]):
+    if re.search(r"^\s*(?:[0-9]+\s*)+$", old_poscar[5]):
         # Use potcar atoms
         with open("POTCAR", "r") as f:
             potcar = f.read()
-        elements = np.array(re.findall("TITEL\s*=\s*\w+\s*(\w+)", potcar))
+        elements = np.array(re.findall(r"TITEL\s*=\s*\w+\s*(\w+)", potcar))
         nelem = np.cumsum([int(a) for a in old_poscar[5].split()])
         last = 5
     else:
@@ -63,7 +63,7 @@ def read_poscar(file="POSCAR"):
 
     atoms = []
     for i, line in enumerate(old_poscar[last+2:]):
-        if re.search("^\s*(?:[\-0-9\.]+(?:e[\-\+]?[0-9]{1,3})?\s*){3}", line):
+        if re.search(r"^\s*(?:[\-0-9\.]+(?:e[\-\+]?[0-9]{1,3})?\s*){3}", line):
             content = line.split()
         else:
             break
@@ -75,7 +75,7 @@ def read_poscar(file="POSCAR"):
         elem = elements[i<=nelem-1][0]
         
         if selective:
-            sel = np.array(content[3:])
+            sel = content[3:]
         else:
             sel = None
             
@@ -112,13 +112,22 @@ def write_poscar(cell,atoms):
 
 def prepare_poscar(cell, atoms, list_atoms, top, tol=postol):
 
+    for i,a in enumerate(list_atoms):
+        try:
+           list_atoms[i] = int(a)
+        except ValueError:
+            pass
+
+    if any(np.array(list_atoms) >= len(atoms)):
+        raise RuntimeError("The atom index cannot be greater than the number of atoms in the POSCAR file. (Atoms indices start at 0)")    
+    
     z = []
     for i,a in enumerate(atoms):
         elem, pos, sel = a
-        if (elem in list_atoms) or (str(i) in list_atoms):
-            sel = np.array(["T","T","T"])
+        if (elem in list_atoms) or (i in list_atoms):
+            sel = ["T","T","T"]
         else:
-            sel = np.array(["F","F","F"])
+            sel = ["F","F","F"]
         a[2] = sel
         z.append((pos[2]+tol)%1)
 
@@ -127,11 +136,14 @@ def prepare_poscar(cell, atoms, list_atoms, top, tol=postol):
 
     idx  = np.argsort(z)
     for i in range(top):
-        atoms[idx[-(i+1)]][2] = np.array(["T","T","T"])
-    
-    write_poscar(cell,atoms)
+        atoms[idx[-(i+1)]][2] = ["T","T","T"]
 
-    return cell,atoms
+    if all(np.concatenate([a[2] for a in atoms]) == "F"):
+        raise RuntimeError("At least one atom needs to be free to calculate the frequencies. Check the -t and -o options." )
+    
+    write_poscar(cell, atoms)
+
+    return cell, atoms
 
 def run_vasp(command, ncores, vasp):
     if ncores == 1:
@@ -146,16 +158,16 @@ def read_outcar():
     except FileNotFoundError:
         return False, None, None, None
 
-    success = re.search("General timing and accounting informations for this job", outcar) is not None
+    success = re.search(r"General timing and accounting informations for this job", outcar) is not None
 
     if not success:
         return False, None, None, None
 
-    ibrion =  int(re.findall("IBRION\s*=\s*([\-0-9]+)", outcar)[-1])
+    ibrion =  int(re.findall(r"IBRION\s*=\s*([\-0-9]+)", outcar)[-1])
 
     freq = []
-    if re.search("Eigenvectors and eigenvalues of the dynamical matrix", outcar):
-        for match in re.finditer("[0-9]+\sf(\/i)*\s*=\s*([0-9.]+)", outcar):
+    if re.search(r"Eigenvectors and eigenvalues of the dynamical matrix", outcar):
+        for match in re.finditer(r"[0-9]+\sf(\/i)*\s*=\s*([0-9.]+)", outcar):
             if match.group(1) is None:
                 freq.append(float(match.group(2)))
             else:
@@ -164,7 +176,7 @@ def read_outcar():
     else:
         freq = None
 
-    E_dft = float(re.findall("energy  without.*sigma\->0\)\s*=\s*([0-9\-\.]+)\s*", outcar)[0])
+    E_dft = float(re.findall(r"energy  without.*sigma\->0\)\s*=\s*([0-9\-\.]+)\s*", outcar)[0])
 
     return success, ibrion, freq, E_dft
 

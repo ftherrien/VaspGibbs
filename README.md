@@ -25,7 +25,7 @@ vasp_gibbs
 Use `-o` (only) or `-t`(top) to specify a set of atoms for which to calculate vibration modes. Examples:
 
  * `-o C O` would only compute vibration modes associated with C and O keeping all other atoms fixed.
- * `-o 1 3 6` would compute vibration modes associated with the first, third and sixth atoms in the POSCAR keeping all other atoms fixed.
+ * `-o 0 2 5` would compute vibration modes associated with the first, third and sixth atoms in the POSCAR keeping all other atoms fixed. (Counts from 0)
  * `-t 10` would compute vibration modes associated with the first 10 atoms starting from the top of the unit cell along the c axis.
 
 This can be useful when computing free energy differences between systems where one part of the system does not change, e.g. adsorption free energies.
